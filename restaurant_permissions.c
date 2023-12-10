@@ -14,6 +14,12 @@ struct UserData
     unsigned int nameLength;
 };
 
+struct Permission
+{
+    int value;
+    const char name[30];
+};
+
 #define NUMBER_OF_USERS 10
 #define USERS_FILE_PATH "users.txt"
 
@@ -34,7 +40,7 @@ int writeUsersToFile(struct UserData *users)
     FILE *file = fopen(USERS_FILE_PATH, "w");
     if (file == NULL)
     {
-        perror("Error opening file");
+        perror("Error opening and writing users to file");
         return 1;
     }
     fprintf(file, "ID\t\tName length\t\tPermissions\t\t\t\tName\n");
@@ -53,7 +59,7 @@ bool hasPermission(int userPermissions, int permissionValue)
     return (userPermissions & permissionValue) != 0;
 }
 
-void populateNewUser(struct UserData *users, char *userName, unsigned int nameLength)
+void populateNewUser(struct UserData *users, char *userName, unsigned int nameLength, unsigned int permissions)
 {
     int lastId = 0;
     for (int i = NUMBER_OF_USERS - 1; i >= 0; i--)
@@ -72,6 +78,7 @@ void populateNewUser(struct UserData *users, char *userName, unsigned int nameLe
     users[lastId].name = userName;
     users[lastId].nameLength = nameLength;
     users[lastId].id = lastId;
+    users[lastId].permissions = permissions;
 }
 
 int readUsersFromFile(struct UserData *users)
@@ -79,8 +86,7 @@ int readUsersFromFile(struct UserData *users)
     bool isFileNotExist = access(USERS_FILE_PATH, F_OK) == -1;
     if (isFileNotExist)
     {
-        writeUsersToFile(users);
-        return 0;
+        return writeUsersToFile(users);
     }
     FILE *file = fopen(USERS_FILE_PATH, "r");
     while (fgetc(file) != '\n')
@@ -90,6 +96,7 @@ int readUsersFromFile(struct UserData *users)
     for (int i = 0; i < NUMBER_OF_USERS; i++)
     {
         fscanf(file, "%u %u %u", &users[i].id, &users[i].nameLength, &users[i].permissions);
+
         unsigned int nameLength = users[i].nameLength;
         if (nameLength > 0)
         {
@@ -105,6 +112,67 @@ int readUsersFromFile(struct UserData *users)
         }
     }
     fclose(file);
+    return 0;
+}
+
+int addUser(struct UserData *users)
+{
+    struct Permission permissionsList[] = {
+        {READ_MENU, "Read Menu"},
+        {GETTING_ORDERS, "Getting Orders"},
+        {EDIT_MENU, "Edit Menu"},
+        {PLACE_ORDERS, "Place Orders"},
+        {MANAGE_RESERVATIONS, "Manage Reservations"},
+        {VIEW_SALES_REPORTS, "View Sales Reports"},
+        {PROCESS_PAYMENTS, "Process Payments"},
+        {ACCESS_KITCHEN, "Access Kitchen"},
+        {EMPLOYEE_MANAGEMENT, "Employee Management"},
+        {VIEW_FEEDBACK, "View Feedback"}};
+
+    char nameBuffer[100];
+    printf("Please enter name: ");
+    scanf(" %[^\n]", nameBuffer);
+    char *userName = malloc(strlen(nameBuffer) + 1);
+    if (userName == NULL)
+    {
+        perror("Memory allocation for userName failed.\n");
+        return 1;
+    }
+    strcpy(userName, nameBuffer);
+    unsigned int permissions = 0;
+    while (1)
+    {
+        unsigned int curentPermission = 0;
+        printf("Enter permission number , 0 to finish\n");
+        if (permissions == OWNER_ROLE)
+        {
+            printf("Nice! seems you the owner");
+            break;
+        }
+        for (int i = 0; i < sizeof(permissionsList) / sizeof(permissionsList[0]); i++)
+        {
+
+            if ((permissions > 0) && (permissionsList[i].value & permissions) != 0)
+            {
+                // we added this permission already
+                continue;
+            }
+            printf("%d. %s\n", i + 1, permissionsList[i].name);
+        }
+        scanf("%u", &curentPermission);
+        if (curentPermission == 0)
+        {
+            break;
+        }
+        permissions |= permissionsList[curentPermission - 1].value;
+    }
+    populateNewUser(users, userName, strlen(nameBuffer), permissions);
+    if (writeUsersToFile(users) == 1)
+    {
+
+        return 1;
+    }
+    printf("\n%s added successfully!\n", userName);
     return 0;
 }
 
@@ -132,27 +200,11 @@ int main()
     {
         printf("1. Add user\n");
     }
-    printf("Press digit above 1\n");
     printf("Selection: ");
     scanf("%d", &userAction);
     if (userAction == 1)
     {
-        char nameBuffer[100];
-        printf("Please enter name: ");
-        scanf(" %[^\n]", nameBuffer);
-        char *userName = malloc(strlen(nameBuffer) + 1);
-        if (userName == NULL)
-        {
-            perror("Memory allocation for userName failed.\n");
-            return 1;
-        }
-        strcpy(userName, nameBuffer);
-        populateNewUser(users, userName, strlen(nameBuffer));
-        if (writeUsersToFile(users) == 1)
-        {
-
-            return 1;
-        }
+        addUser(users);
     }
     else
     {
