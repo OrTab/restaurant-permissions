@@ -1,5 +1,6 @@
-#ifndef ROLES
-#define ROLES
+#ifndef ROLES_H_
+#define ROLES_H_
+#include "../permissions/permissions.h"
 
 #define OWNER_ROLE TOTAL_PERMISSIONS
 

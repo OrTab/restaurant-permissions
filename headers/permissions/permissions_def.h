@@ -1,4 +1,5 @@
-#ifndef PERMISSIONS
+#ifndef PERMISSIONS_DEF_H_
+#define PERMISSIONS_DEF_H_
 
 #define READ_MENU 1 << 0
 #define GETTING_ORDERS 1 << 1

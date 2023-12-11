@@ -3,41 +3,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#include "permissions.h"
-#include "roles.h"
-
-#define NUMBER_OF_USERS 10
-#define USERS_FILE_PATH "users.txt"
-#define MAX_NAME_LENGTH 100
-#define MAX_PERMISSION_NAME_LENGTH 30
-
-struct UserData
-{
-    unsigned id;
-    unsigned int permissions;
-    char *name;
-    unsigned int nameLength;
-};
-
-struct Permission
-{
-    unsigned int value;
-    const char name[MAX_PERMISSION_NAME_LENGTH];
-};
-
-const struct Permission permissionsList[] = {
-    {READ_MENU, "Read Menu"},
-    {GETTING_ORDERS, "Getting Orders"},
-    {EDIT_MENU, "Edit Menu"},
-    {PLACE_ORDERS, "Place Orders"},
-    {MANAGE_RESERVATIONS, "Manage Reservations"},
-    {VIEW_SALES_REPORTS, "View Sales Reports"},
-    {PROCESS_PAYMENTS, "Process Payments"},
-    {ACCESS_KITCHEN, "Access Kitchen"},
-    {EMPLOYEE_MANAGEMENT, "Employee Management"},
-    {VIEW_FEEDBACK, "View Feedback"}};
-
-#define LENGTH_OF_PERMISSIONS sizeof(permissionsList) / sizeof(permissionsList[0])
+#include "headers/user/user.h"
+#include "headers/permissions/permissions.h"
+#include "headers/roles/roles.h"
 
 bool hasPermission(int userPermissions, int permissionValue)
 {
