@@ -172,13 +172,8 @@ int addUser(struct UserData *users)
 {
 
     char nameBuffer[MAX_NAME_LENGTH];
-    printf("Please enter name: ");
+    printf("(Name must be at least 1 char unless you wont be able to continue)\nPlease enter name: ");
     scanf(" %[^\n]", nameBuffer);
-    if (strlen(nameBuffer) == 0)
-    {
-        printf("Name cannot be empty!");
-        return 1;
-    }
     char *userName = malloc(strlen(nameBuffer) + 1);
     if (userName == NULL)
     {
