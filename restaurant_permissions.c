@@ -6,6 +6,11 @@
 #include "permissions.h"
 #include "roles.h"
 
+#define NUMBER_OF_USERS 10
+#define USERS_FILE_PATH "users.txt"
+#define MAX_NAME_LENGTH 100
+#define MAX_PERMISSION_NAME_LENGTH 30
+
 struct UserData
 {
     unsigned id;
@@ -16,13 +21,28 @@ struct UserData
 
 struct Permission
 {
-    int value;
-    const char name[30];
+    unsigned int value;
+    const char name[MAX_PERMISSION_NAME_LENGTH];
 };
 
-#define NUMBER_OF_USERS 10
-#define USERS_FILE_PATH "users.txt"
-#define MAX_NAME_LENGTH 100
+const struct Permission permissionsList[] = {
+    {READ_MENU, "Read Menu"},
+    {GETTING_ORDERS, "Getting Orders"},
+    {EDIT_MENU, "Edit Menu"},
+    {PLACE_ORDERS, "Place Orders"},
+    {MANAGE_RESERVATIONS, "Manage Reservations"},
+    {VIEW_SALES_REPORTS, "View Sales Reports"},
+    {PROCESS_PAYMENTS, "Process Payments"},
+    {ACCESS_KITCHEN, "Access Kitchen"},
+    {EMPLOYEE_MANAGEMENT, "Employee Management"},
+    {VIEW_FEEDBACK, "View Feedback"}};
+
+#define LENGTH_OF_PERMISSIONS sizeof(permissionsList) / sizeof(permissionsList[0])
+
+bool hasPermission(int userPermissions, int permissionValue)
+{
+    return (userPermissions & permissionValue) != 0;
+}
 
 int viewPermissions(struct UserData *users)
 {
@@ -40,13 +60,35 @@ int viewPermissions(struct UserData *users)
     }
     if (userId == -1)
     {
+
         printf("Couldn\'t find you!");
         return 1;
     }
     else
     {
         unsigned int userPermissions = users[userId].permissions;
-        printf("Yes i found you and you permission is: %u ", userPermissions);
+        char userPermissionsNames[LENGTH_OF_PERMISSIONS][MAX_PERMISSION_NAME_LENGTH];
+        unsigned int lastIndexForUserPermissionsNames = 0;
+        for (int i = 0; i < LENGTH_OF_PERMISSIONS; i++)
+        {
+            struct Permission currentPermission = permissionsList[i];
+            if (userPermissions > 0 && hasPermission(userPermissions, currentPermission.value))
+            {
+                snprintf(userPermissionsNames[lastIndexForUserPermissionsNames++], MAX_PERMISSION_NAME_LENGTH, "%s", currentPermission.name);
+            }
+        }
+        if (lastIndexForUserPermissionsNames > 0)
+        {
+            printf("Nice! you can ");
+            for (int i = 0; i < lastIndexForUserPermissionsNames; i++)
+            {
+                printf("%s", userPermissionsNames[i]);
+                if (i != lastIndexForUserPermissionsNames - 1)
+                {
+                    printf(" and ");
+                }
+            }
+        }
         return 0;
     }
 }
@@ -80,11 +122,6 @@ int writeUsersToFile(struct UserData *users)
 
     fclose(file);
     return 0;
-}
-
-bool hasPermission(int userPermissions, int permissionValue)
-{
-    return (userPermissions & permissionValue) != 0;
 }
 
 void populateNewUser(struct UserData *users, char *userName, unsigned int nameLength, unsigned int permissions)
@@ -143,17 +180,6 @@ int readUsersFromFile(struct UserData *users)
 
 int addUser(struct UserData *users)
 {
-    struct Permission permissionsList[] = {
-        {READ_MENU, "Read Menu"},
-        {GETTING_ORDERS, "Getting Orders"},
-        {EDIT_MENU, "Edit Menu"},
-        {PLACE_ORDERS, "Place Orders"},
-        {MANAGE_RESERVATIONS, "Manage Reservations"},
-        {VIEW_SALES_REPORTS, "View Sales Reports"},
-        {PROCESS_PAYMENTS, "Process Payments"},
-        {ACCESS_KITCHEN, "Access Kitchen"},
-        {EMPLOYEE_MANAGEMENT, "Employee Management"},
-        {VIEW_FEEDBACK, "View Feedback"}};
 
     char nameBuffer[MAX_NAME_LENGTH];
     printf("Please enter name: ");
@@ -180,10 +206,10 @@ int addUser(struct UserData *users)
             printf("Nice! seems you the owner");
             break;
         }
-        for (int i = 0; i < sizeof(permissionsList) / sizeof(permissionsList[0]); i++)
+        for (int i = 0; i < LENGTH_OF_PERMISSIONS; i++)
         {
 
-            if ((permissions > 0) && (permissionsList[i].value & permissions) != 0)
+            if ((permissions > 0) && hasPermission(permissionsList[i].value, permissions))
             {
                 // we added this permission already
                 continue;
