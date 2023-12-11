@@ -5,12 +5,11 @@
 #define NUMBER_OF_USERS 10
 #define USERS_FILE_PATH "users.txt"
 
-struct UserData
-{
-    unsigned id;
-    unsigned int permissions;
-    char *name;
-    unsigned int nameLength;
+struct UserData {
+  unsigned id;
+  unsigned int permissions;
+  char *name;
+  unsigned int nameLength;
 };
 
 #endif
