@@ -20,7 +20,7 @@ Welcome to the Restaurant Permissions Project! This C language project provides 
 To start with the project:
 
 1. Ensure you have a C compiler installed (you can use any C compiler). Check by running `gcc -v`.
-2. Compile the project using `gcc restaurant_permissions.c`.
+2. Compile the project using `gcc main.c`.
 3. Execute the generated output file.
 
 ## Usage
