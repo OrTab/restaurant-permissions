@@ -22,6 +22,34 @@ struct Permission
 
 #define NUMBER_OF_USERS 10
 #define USERS_FILE_PATH "users.txt"
+#define MAX_NAME_LENGTH 100
+
+int viewPermissions(struct UserData *users)
+{
+    char userNameInput[MAX_NAME_LENGTH];
+    printf("Please enter your name: ");
+    scanf(" %[^\n]", userNameInput);
+    int userId = -1;
+    for (int i = 0; i < NUMBER_OF_USERS; i++)
+    {
+        if (strcmp(users[i].name, userNameInput) == 0)
+        {
+            userId = i;
+            break;
+        }
+    }
+    if (userId == -1)
+    {
+        printf("Couldn\'t find you!");
+        return 1;
+    }
+    else
+    {
+        unsigned int userPermissions = users[userId].permissions;
+        printf("Yes i found you and you permission is: %u ", userPermissions);
+        return 0;
+    }
+}
 
 void freeUsers(struct UserData *users)
 {
@@ -61,20 +89,18 @@ bool hasPermission(int userPermissions, int permissionValue)
 
 void populateNewUser(struct UserData *users, char *userName, unsigned int nameLength, unsigned int permissions)
 {
-    int lastId = 0;
+    int lastId = -1;
     for (int i = NUMBER_OF_USERS - 1; i >= 0; i--)
     {
-        if (users[i].id != 0)
+        if (users[i].nameLength > 0)
         {
             lastId = users[i].id;
             break;
         }
     }
 
-    if (users[lastId].nameLength > 0)
-    {
-        lastId++;
-    }
+    lastId++;
+
     users[lastId].name = userName;
     users[lastId].nameLength = nameLength;
     users[lastId].id = lastId;
@@ -129,9 +155,14 @@ int addUser(struct UserData *users)
         {EMPLOYEE_MANAGEMENT, "Employee Management"},
         {VIEW_FEEDBACK, "View Feedback"}};
 
-    char nameBuffer[100];
+    char nameBuffer[MAX_NAME_LENGTH];
     printf("Please enter name: ");
     scanf(" %[^\n]", nameBuffer);
+    if (strlen(nameBuffer) == 0)
+    {
+        printf("Name cannot be empty!");
+        return 1;
+    }
     char *userName = malloc(strlen(nameBuffer) + 1);
     if (userName == NULL)
     {
@@ -178,7 +209,6 @@ int addUser(struct UserData *users)
 
 int main()
 {
-    int userPermissionsInput;
     int userAction;
     struct UserData *users = (struct UserData *)malloc((NUMBER_OF_USERS * sizeof(struct UserData)));
     if (users == NULL)
@@ -200,6 +230,7 @@ int main()
     {
         printf("1. Add user\n");
     }
+    printf("2. View my permissions\n");
     printf("Selection: ");
     scanf("%d", &userAction);
     if (userAction == 1)
@@ -208,18 +239,9 @@ int main()
     }
     else
     {
-        printf("Please type in your permissions id: ");
-        scanf("%d", &userPermissionsInput);
-        if (userPermissionsInput <= 0)
+        if (viewPermissions(users) == 1)
         {
-            printf("Invalid input, must be a positive number");
-            return 0;
-        }
-        unsigned int userPermissions = (unsigned)userPermissionsInput;
-        if (userPermissions > TOTAL_PERMISSIONS)
-        {
-            printf("Invalid input, maximum value is %d", TOTAL_PERMISSIONS);
-            return 0;
+            return 1;
         }
     }
     freeUsers(users);
