@@ -54,6 +54,7 @@ int viewPermissions(struct UserData *users)
         unsigned int userPermissions = users[userId].permissions;
         unsigned int userPermissionsCounter = 0;
         int lengthOfPermissions = getLengthOfPermissions();
+
         for (int i = 0; i < lengthOfPermissions; i++)
         {
             struct Permission currentPermission = permissionsList[i];
@@ -70,6 +71,10 @@ int viewPermissions(struct UserData *users)
                 printf("%s", currentPermission.name);
                 userPermissionsCounter++;
             }
+        }
+        if (userPermissionsCounter == 0)
+        {
+            printf("Oppss, seems you have no permissions");
         }
 
         return 0;

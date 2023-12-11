@@ -1,7 +1,7 @@
 ID		Name length		Permissions				Name
-0			8				1023					Or Tabin
-1			7				769					Dasha v
-0			0				0					(null)
+0			8				1023					Or Tab
+1			7				769					Dari v
+2			10				0					Ori
 0			0				0					(null)
 0			0				0					(null)
 0			0				0					(null)
