@@ -67,28 +67,25 @@ int viewPermissions(struct UserData *users)
     else
     {
         unsigned int userPermissions = users[userId].permissions;
-        char userPermissionsNames[LENGTH_OF_PERMISSIONS][MAX_PERMISSION_NAME_LENGTH];
-        unsigned int lastIndexForUserPermissionsNames = 0;
+        unsigned int userPermissionsCounter = 0;
         for (int i = 0; i < LENGTH_OF_PERMISSIONS; i++)
         {
             struct Permission currentPermission = permissionsList[i];
             if (userPermissions > 0 && hasPermission(userPermissions, currentPermission.value))
             {
-                snprintf(userPermissionsNames[lastIndexForUserPermissionsNames++], MAX_PERMISSION_NAME_LENGTH, "%s", currentPermission.name);
-            }
-        }
-        if (lastIndexForUserPermissionsNames > 0)
-        {
-            printf("Nice! you can ");
-            for (int i = 0; i < lastIndexForUserPermissionsNames; i++)
-            {
-                printf("%s", userPermissionsNames[i]);
-                if (i != lastIndexForUserPermissionsNames - 1)
+                if (userPermissionsCounter == 0)
+                {
+                    printf("Nice! you can ");
+                }
+                else
                 {
                     printf(" and ");
                 }
+                printf("%s", currentPermission.name);
+                userPermissionsCounter++;
             }
         }
+
         return 0;
     }
 }
@@ -117,7 +114,8 @@ int writeUsersToFile(struct UserData *users)
 
     for (int i = 0; i < NUMBER_OF_USERS; i++)
     {
-        fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id, users[i].nameLength, users[i].permissions, users[i].name);
+        fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id,
+                users[i].nameLength, users[i].permissions, users[i].name);
     }
 
     fclose(file);
