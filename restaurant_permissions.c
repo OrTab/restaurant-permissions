@@ -164,7 +164,7 @@ int addUser(struct UserData *users) {
   unsigned int permissions = 0;
   unsigned int lengthOfPermissions = getLengthOfPermissions();
   while (1) {
-    unsigned int curentPermission = 0;
+    int currentPermission = 0;
     printf("Enter permission number , 0 to finish\n");
     if (permissions == OWNER_ROLE) {
       printf("Nice! seems you the owner");
@@ -178,11 +178,17 @@ int addUser(struct UserData *users) {
       }
       printf("%d. %s\n", i + 1, permissionsList[i].name);
     }
-    scanf("%u", &curentPermission);
-    if (curentPermission == 0) {
+    scanf("%d", &currentPermission);
+    if (currentPermission == 0) {
       break;
     }
-    permissions |= permissionsList[curentPermission - 1].value;
+    if (currentPermission < 0 || currentPermission > lengthOfPermissions) {
+      printf(
+          "Please enter a valid permission number (1 to %u), or 0 to finish\n",
+          lengthOfPermissions);
+      continue;
+    }
+    permissions |= permissionsList[currentPermission - 1].value;
   }
   populateNewUser(users, userName, strlen(nameBuffer), permissions);
   if (writeUsersToFile(users) == 1) {
