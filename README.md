@@ -2,27 +2,48 @@
 
 ## Overview
 
-This C language project is designed to explore the use of bitwise operators and bit flags for efficient handling of permissions in a restaurant management system. The primary aim is to understand how bitwise operations can be leveraged to manage user permissions using compact bit flags.
+Welcome to the Restaurant Permissions Project! This C language project provides practical experience with bitwise operators, memory management, string handling, and file I/O in the context of a restaurant management system. The primary focus is on bitwise operations, enabling efficient user permission management through compact bit flags.
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Bitwise Operators and Permissions](#bitwise-operators-and-permissions)
-- [Roles and Permissions](#roles-and-permissions)
+- [Key Aspects](#key-aspects)
+  - [Bitwise Operators](#bitwise-operators)
+  - [Memory Management](#memory-management)
+  - [String Handling](#string-handling)
+  - [File I/O](#file-io)
 
 ## Installation
 
-To get started with the project, follow these installation steps [provide instructions if any].
+To start with the project:
+
+1. Ensure you have a C compiler installed (you can use any C compiler). Check by running `gcc -v`.
+2. Compile the project using `gcc restaurant_permissions.c`.
+3. Execute the generated output file.
 
 ## Usage
 
-This project serves as a learning ground for bitwise operations in the context of a restaurant management system. Explore the code to understand how permissions are managed and how different roles are assigned using bitwise flags.
+Explore the code to understand the implementation of bitwise operations, memory management, string handling, and file I/O within a restaurant management system. The project provides hands-on experience and practical knowledge in these essential areas of C programming.
 
-## Bitwise Operators and Permissions
+## Key Aspects
 
-Bitwise operators, such as AND (`&`), OR (`|`), and left shift (`<<`), are fundamental to the project. These operators are used to manipulate individual bits in an integer, representing various permissions. The compact nature of bitwise flags allows for efficient storage and retrieval of permission information.
+### Bitwise Operators
 
-## Roles and Permissions
+Gain insights into fundamental bitwise operators such as AND (`&`), OR (`|`), and left shift (`<<`). Understand their role in manipulating individual bits, representing various permissions. The project demonstrates efficient handling of permission information.
 
-Roles, such as the restaurant owner and waiter, are defined with specific permission sets. Each permission is represented by a unique bit, and roles are created by combining these permissions using bitwise OR (`|`). Checking for permissions involves using the bitwise AND (`&`) operator. This approach provides a concise way to manage and query permissions.
+### Memory Management
+
+Dive into memory management practices, including dynamic memory allocation and deallocation. Learn to use `malloc` and `free` for efficient handling of user names and structs, preventing memory leaks.
+
+### String Handling
+
+Explore robust string handling techniques, emphasizing the use of functions like `strcpy` for managing and manipulating user names. In this project, dynamic memory allocation is employed when reading user names from a file, considering the string length property. Similarly, when adding a new user, memory is dynamically allocated to store the user's name. This ensures efficient memory usage and adaptability to varying string lengths in the C language.
+
+Learn effective ways to work with strings, incorporating dynamic memory allocation for user names when reading from files and when adding new users.
+
+### File I/O
+
+Understand file input and output operations for reading from and writing to files. Learn how to store user data persistently, enabling information retrieval between program executions.
+
+Happy coding!
