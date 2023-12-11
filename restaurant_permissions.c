@@ -52,6 +52,11 @@ int viewPermissions(struct UserData *users)
     else
     {
         unsigned int userPermissions = users[userId].permissions;
+        if (userPermissions == 0)
+        {
+            printf("Oppss, seems you have no permissions");
+            return 0;
+        }
         unsigned int userPermissionsCounter = 0;
         int lengthOfPermissions = getLengthOfPermissions();
 
@@ -71,10 +76,6 @@ int viewPermissions(struct UserData *users)
                 printf("%s", currentPermission.name);
                 userPermissionsCounter++;
             }
-        }
-        if (userPermissionsCounter == 0)
-        {
-            printf("Oppss, seems you have no permissions");
         }
 
         return 0;
@@ -156,7 +157,7 @@ int readUsersFromFile(struct UserData *users)
             users[i].name = malloc(nameLength + 1);
             if (users[i].name == NULL)
             {
-                perror("Memory allocation for users failed.\n");
+                perror("Memory allocation for user name failed.\n");
                 return 1;
             }
             fscanf(file, " %[^\n]", users[i].name);
