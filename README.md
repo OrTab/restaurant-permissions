@@ -13,6 +13,7 @@ Welcome to the Restaurant Permissions Project! This C language project provides 
   - [Memory Management](#memory-management)
   - [String Handling](#string-handling)
   - [File I/O](#file-io)
+  - [Header Files](#header-files)
 
 ## Installation
 
@@ -45,5 +46,11 @@ Learn effective ways to work with strings, incorporating dynamic memory allocati
 ### File I/O
 
 Understand file input and output operations for reading from and writing to files. Learn how to store user data persistently, enabling information retrieval between program executions.
+
+### Header Files
+
+This project makes use of modular programming by employing header files to organize and encapsulate related functionality. Various aspects of the project, such as user management, permissions, and roles, are encapsulated in separate header files (`headers folder`). These header files serve as helpers, providing clear interfaces and aiding in code organization.
+
+Explore the contents of these header files to understand how they facilitate modularity, encapsulation, and code reuse. Header files play a crucial role in making the codebase more maintainable and understandable, promoting a modular design approach.
 
 Happy coding!
