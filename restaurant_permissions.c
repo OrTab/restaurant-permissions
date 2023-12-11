@@ -7,9 +7,26 @@
 #include "headers/permissions/permissions.h"
 #include "headers/roles/roles.h"
 
+const struct Permission permissionsList[] = {
+    {READ_MENU, "Read Menu"},
+    {GETTING_ORDERS, "Getting Orders"},
+    {EDIT_MENU, "Edit Menu"},
+    {PLACE_ORDERS, "Place Orders"},
+    {MANAGE_RESERVATIONS, "Manage Reservations"},
+    {VIEW_SALES_REPORTS, "View Sales Reports"},
+    {PROCESS_PAYMENTS, "Process Payments"},
+    {ACCESS_KITCHEN, "Access Kitchen"},
+    {EMPLOYEE_MANAGEMENT, "Employee Management"},
+    {VIEW_FEEDBACK, "View Feedback"}};
+
 bool hasPermission(int userPermissions, int permissionValue)
 {
     return (userPermissions & permissionValue) != 0;
+}
+
+int getLengthOfPermissions()
+{
+    return (int)(sizeof(permissionsList) / sizeof(permissionsList[0]));
 }
 
 int viewPermissions(struct UserData *users)
@@ -36,7 +53,8 @@ int viewPermissions(struct UserData *users)
     {
         unsigned int userPermissions = users[userId].permissions;
         unsigned int userPermissionsCounter = 0;
-        for (int i = 0; i < LENGTH_OF_PERMISSIONS; i++)
+        int lengthOfPermissions = getLengthOfPermissions();
+        for (int i = 0; i < lengthOfPermissions; i++)
         {
             struct Permission currentPermission = permissionsList[i];
             if (userPermissions > 0 && hasPermission(userPermissions, currentPermission.value))
@@ -163,6 +181,7 @@ int addUser(struct UserData *users)
     }
     strcpy(userName, nameBuffer);
     unsigned int permissions = 0;
+    int lengthOfPermissions = getLengthOfPermissions();
     while (1)
     {
         unsigned int curentPermission = 0;
@@ -172,7 +191,7 @@ int addUser(struct UserData *users)
             printf("Nice! seems you the owner");
             break;
         }
-        for (int i = 0; i < LENGTH_OF_PERMISSIONS; i++)
+        for (int i = 0; i < lengthOfPermissions; i++)
         {
 
             if ((permissions > 0) && hasPermission(permissionsList[i].value, permissions))

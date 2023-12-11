@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "headers/user/user.h"
-#include "restaurant_permissions.c"
+#include "headers/permissions/restaurant_permissions_functions.h"
 
 int main()
 {
