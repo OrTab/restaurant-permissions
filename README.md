@@ -33,7 +33,7 @@ Explore the code to understand the implementation of bitwise operations, memory 
 
 This project makes extensive use of fundamental bitwise operators, including AND (`&`), OR (`|`), XOR (`^`), and left shift (`<<`), to manipulate individual bits efficiently. These operators are pivotal in representing and managing various permissions within the system.
 
-### Key Bitwise Operations
+#### Key Bitwise Operations
 
 #### AND (`&`)
 
