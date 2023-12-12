@@ -59,7 +59,7 @@ unsigned int getLengthOfPermissions() {
 
 char *getNameFromUser() {
   char userNameInput[MAX_NAME_LENGTH];
-  printf("Please enter your name: ");
+  printf("\nPlease enter your name: ");
   scanf(" %[^\n]", userNameInput);
   char *userName = malloc(strlen(userNameInput) + 1);
   if (userName == NULL) {
@@ -70,6 +70,121 @@ char *getNameFromUser() {
   return userName;
 }
 
+void writeUsersToFile() {
+  FILE *file = fopen(USERS_FILE_PATH, "w");
+  if (file == NULL) {
+    perror("Error opening and writing users to file");
+    exitProgram(true);
+  }
+  fprintf(file, "ID\t\tName length\t\tPermissions\t\t\t\tName\n");
+
+  for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
+    fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id,
+            users[i].nameLength, users[i].permissions, users[i].name);
+  }
+  if (fclose(file) != 0) {
+    perror("Error closing file");
+    exitProgram(true);
+  }
+}
+
+void printPermissionActions(unsigned int permissions, unsigned int action) {
+  unsigned int lengthOfPermissions = getLengthOfPermissions();
+  for (unsigned int i = 0; i < lengthOfPermissions; i++) {
+    bool hasCurrentPermission =
+        hasPermission(permissionsList[i].value, permissions);
+    if (action == 2) {
+      if (hasCurrentPermission) {
+        printf("%d. %s\n", i + 1, permissionsList[i].name);
+      }
+    } else {
+      if (permissions > 0 && hasCurrentPermission) {
+        // we added this permission already
+        continue;
+      } else {
+        printf("%d. %s\n", i + 1, permissionsList[i].name);
+      }
+    }
+  }
+}
+
+bool isPermissionAddedOrRemoved(unsigned int action, unsigned int permissions,
+                                unsigned int currentPermissionValue) {
+  if (action == 1) {
+    if (hasPermission(permissions, currentPermissionValue)) {
+      printf("You added this permission already!");
+      return true;
+    }
+  } else {
+    if (!hasPermission(permissions, currentPermissionValue)) {
+      printf("You removed this permission already!");
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isSelectionOutOfRange(int currentPermission) {
+  unsigned int lengthOfPermissions = getLengthOfPermissions();
+  bool isOutOfRange =
+      currentPermission < 0 || currentPermission > lengthOfPermissions;
+  if (isOutOfRange) {
+    printf("Please enter a valid permission number (1 to %u), or 0 to finish\n",
+           lengthOfPermissions);
+  }
+  return isOutOfRange;
+}
+
+unsigned int getUpdatedPermissionValue(unsigned int permissions,
+                                       unsigned int action,
+                                       unsigned int currentPermissionValue) {
+  if (action == 1) {
+    permissions |= currentPermissionValue;
+  } else {
+    permissions ^= currentPermissionValue;
+  }
+  return permissions;
+}
+
+/**
+ * Modify user permissions.
+ *
+ * @param userId The ID of the user to modify. Use -1 to add a new user.
+ * @param action The action to perform: 1 for add, 2 for remove.
+ * @return The modified user permissions.
+ */
+unsigned int modifyPermission(int userId, unsigned int action) {
+  unsigned int permissions = userId == -1 ? 0 : users[userId].permissions;
+  unsigned int lengthOfPermissions = getLengthOfPermissions();
+  while (1) {
+    int currentPermission = 0;
+    printf("\nEnter permission number , 0 to finish\n");
+    if (permissions == OWNER_ROLE && action != 2) {
+      printf("Nice! seems you the owner");
+      break;
+    }
+    printPermissionActions(permissions, action);
+    scanf("%d", &currentPermission);
+
+    if (currentPermission == 0) {
+      break;
+    }
+    unsigned int currentPermissionValue =
+        permissionsList[currentPermission - 1].value;
+
+    if (isPermissionAddedOrRemoved(action, permissions,
+                                   currentPermissionValue)) {
+      continue;
+    }
+    if (isSelectionOutOfRange(currentPermission)) {
+      continue;
+    }
+    permissions =
+        getUpdatedPermissionValue(permissions, action, currentPermissionValue);
+  }
+  return permissions;
+}
+
 void editUser() {
   char *userName = getNameFromUser();
   int userId = getUserIdByName(userName);
@@ -78,7 +193,26 @@ void editUser() {
     free(userName);
     exitProgram(true);
   }
-  printf("Hey %s!\nEdit implantation coming soon :)", userName);
+
+  int choice = -1;
+  while (choice != 1 && choice != 2) {
+    if (choice == 0) {
+      exitProgram(false);
+    }
+    if (choice != -1) {
+      printf("\nMust enter valid choice\n");
+    }
+    printf("%d", choice);
+    printf("Would you like remove or add permission? 0 to exit\n");
+    printf("1. Add\n");
+    printf("2. Remove\n");
+    printf("Selection: ");
+    scanf("%d", &choice);
+  }
+  unsigned int permissions = modifyPermission(userId, choice);
+  users[userId].permissions = permissions;
+  writeUsersToFile();
+  printf("%d updated successfully!", userName);
 }
 
 void viewPermissions() {
@@ -110,21 +244,6 @@ void viewPermissions() {
       userPermissionsCounter++;
     }
   }
-}
-
-void writeUsersToFile() {
-  FILE *file = fopen(USERS_FILE_PATH, "w");
-  if (file == NULL) {
-    perror("Error opening and writing users to file");
-    exitProgram(true);
-  }
-  fprintf(file, "ID\t\tName length\t\tPermissions\t\t\t\tName\n");
-
-  for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
-    fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id,
-            users[i].nameLength, users[i].permissions, users[i].name);
-  }
-  fclose(file);
 }
 
 void populateNewUser(char *userName, unsigned int permissions) {
@@ -175,35 +294,7 @@ void addUser() {
       "(Name must be at least 1 char unless you wont be able to "
       "continue)\n");
   char *userName = getNameFromUser();
-  unsigned int permissions = 0;
-  unsigned int lengthOfPermissions = getLengthOfPermissions();
-  while (1) {
-    int currentPermission = 0;
-    printf("Enter permission number , 0 to finish\n");
-    if (permissions == OWNER_ROLE) {
-      printf("Nice! seems you the owner");
-      break;
-    }
-    for (unsigned int i = 0; i < lengthOfPermissions; i++) {
-      if ((permissions > 0) &&
-          hasPermission(permissionsList[i].value, permissions)) {
-        // we added this permission already
-        continue;
-      }
-      printf("%d. %s\n", i + 1, permissionsList[i].name);
-    }
-    scanf("%d", &currentPermission);
-    if (currentPermission == 0) {
-      break;
-    }
-    if (currentPermission < 0 || currentPermission > lengthOfPermissions) {
-      printf(
-          "Please enter a valid permission number (1 to %u), or 0 to finish\n",
-          lengthOfPermissions);
-      continue;
-    }
-    permissions |= permissionsList[currentPermission - 1].value;
-  }
+  unsigned int permissions = modifyPermission(-1, 1);
   populateNewUser(userName, permissions);
   writeUsersToFile();
   printf("\n%s added successfully!\n", userName);
