@@ -29,25 +29,25 @@ Explore the code to understand the implementation of bitwise operations, memory 
 
 ## Key Aspects
 
-# Bitwise Operators
+### Bitwise Operators
 
 This project makes extensive use of fundamental bitwise operators, including AND (`&`), OR (`|`), XOR (`^`), and left shift (`<<`), to manipulate individual bits efficiently. These operators are pivotal in representing and managing various permissions within the system.
 
-## Key Bitwise Operations
+#### Key Bitwise Operations
 
-### AND (`&`)
+##### AND (`&`)
 
 Used to check the presence of specific permissions.
 
-### OR (`|`)
+##### OR (`|`)
 
 Employed for adding or granting new permissions.
 
-### XOR (`^`)
+##### XOR (`^`)
 
 Implemented for toggling or removing permissions.
 
-### Left Shift (`<<`)
+##### Left Shift (`<<`)
 
 This operator is utilized for left-shifting bits, effectively multiplying the value by 2 raised to the power of the shift count. In the context of permissions, left shift is often used to assign distinct bit positions to different permission types, creating a binary representation where each bit corresponds to a specific permission. For example, `1 << 3` results in the binary value `00001000`, assigning the fourth bit for a particular permission.
 
