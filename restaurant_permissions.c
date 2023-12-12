@@ -70,6 +70,17 @@ char *getNameFromUser() {
   return userName;
 }
 
+void editUser() {
+  char *userName = getNameFromUser();
+  int userId = getUserIdByName(userName);
+  if (userId == -1) {
+    printf("Couldn\'t find you!");
+    free(userName);
+    exitProgram(true);
+  }
+  printf("Hey %s!\nEdit implantation coming soon :)", userName);
+}
+
 void viewPermissions() {
   char *userName = getNameFromUser();
   int userId = getUserIdByName(userName);
@@ -77,27 +88,26 @@ void viewPermissions() {
   if (userId == -1) {
     printf("Couldn\'t find you!");
     exitProgram(true);
-  } else {
-    unsigned int userPermissions = users[userId].permissions;
-    if (userPermissions == 0) {
-      printf("Oppss, seems you have no permissions");
-      exitProgram(false);
-    }
-    unsigned int userPermissionsCounter = 0;
-    unsigned int lengthOfPermissions = getLengthOfPermissions();
+  }
+  unsigned int userPermissions = users[userId].permissions;
+  if (userPermissions == 0) {
+    printf("Oppss, seems you have no permissions");
+    exitProgram(false);
+  }
+  unsigned int userPermissionsCounter = 0;
+  unsigned int lengthOfPermissions = getLengthOfPermissions();
 
-    for (unsigned int i = 0; i < lengthOfPermissions; i++) {
-      struct Permission currentPermission = permissionsList[i];
-      if (userPermissions > 0 &&
-          hasPermission(userPermissions, currentPermission.value)) {
-        if (userPermissionsCounter == 0) {
-          printf("Nice! you can ");
-        } else {
-          printf(" and ");
-        }
-        printf("%s", currentPermission.name);
-        userPermissionsCounter++;
+  for (unsigned int i = 0; i < lengthOfPermissions; i++) {
+    struct Permission currentPermission = permissionsList[i];
+    if (userPermissions > 0 &&
+        hasPermission(userPermissions, currentPermission.value)) {
+      if (userPermissionsCounter == 0) {
+        printf("Nice! you can ");
+      } else {
+        printf(" and ");
       }
+      printf("%s", currentPermission.name);
+      userPermissionsCounter++;
     }
   }
 }

@@ -13,9 +13,7 @@ int main() {
     perror("Memory allocation for users failed.\n");
     return 1;
   }
-  if (readUsersFromFile() == 1) {
-    return 1;
-  }
+  readUsersFromFile();
   printf("\n*** Welcome to The Restaurant Of Permissions ***\n\n");
   printf("What you want to do?\n");
   if (users[NUMBER_OF_USERS - 1].id != 0) {
@@ -30,13 +28,9 @@ int main() {
   if (userAction == 1) {
     addUser();
   } else if (userAction == 2) {
-    if (viewPermissions() == 1) {
-      return 1;
-    }
+    editUser();
   } else if (userAction == 3) {
-    if (viewPermissions() == 1) {
-      return 1;
-    }
+    viewPermissions();
   }
   freeUsers();
   return 0;

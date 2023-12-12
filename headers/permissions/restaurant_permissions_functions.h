@@ -2,9 +2,10 @@
 #define RESTAURANT_PERMISSIONS_FUNCTIONS_H_
 #include "../user/user.h"
 
-int viewPermissions();
+void viewPermissions();
 void freeUsers();
-int readUsersFromFile();
-int addUser();
+void readUsersFromFile();
+void addUser();
+void editUser();
 
 #endif
