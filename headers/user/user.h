@@ -12,4 +12,6 @@ struct UserData {
   unsigned int nameLength;
 };
 
+extern struct UserData *users;
+
 #endif

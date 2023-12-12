@@ -4,15 +4,16 @@
 #include "headers/permissions/restaurant_permissions_functions.h"
 #include "headers/user/user.h"
 
+struct UserData *users = NULL;
+
 int main() {
   int userAction;
-  struct UserData *users =
-      (struct UserData *)malloc((NUMBER_OF_USERS * sizeof(struct UserData)));
+  users = malloc((NUMBER_OF_USERS * sizeof(struct UserData)));
   if (users == NULL) {
     perror("Memory allocation for users failed.\n");
     return 1;
   }
-  if (readUsersFromFile(users) == 1) {
+  if (readUsersFromFile() == 1) {
     return 1;
   }
   printf("\n*** Welcome to The Restaurant Of Permissions ***\n\n");
@@ -22,16 +23,21 @@ int main() {
   } else {
     printf("1. Add user\n");
   }
-  printf("2. View my permissions\n");
+  printf("2. Edit user\n");
+  printf("3. View my permissions\n");
   printf("Selection: ");
   scanf("%d", &userAction);
   if (userAction == 1) {
-    addUser(users);
-  } else {
-    if (viewPermissions(users) == 1) {
+    addUser();
+  } else if (userAction == 2) {
+    if (viewPermissions() == 1) {
+      return 1;
+    }
+  } else if (userAction == 3) {
+    if (viewPermissions() == 1) {
       return 1;
     }
   }
-  freeUsers(users);
+  freeUsers();
   return 0;
 }

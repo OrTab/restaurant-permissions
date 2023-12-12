@@ -20,10 +20,27 @@ const struct Permission permissionsList[] = {
     {EMPLOYEE_MANAGEMENT, "Employee Management"},
     {VIEW_FEEDBACK, "View Feedback"}};
 
-int getUserIdByName(struct UserData *users, char userName[MAX_NAME_LENGTH]) {
+void freeUsers() {
+  for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
+    if (users[i].name) {
+      free(users[i].name);
+    }
+  }
+  free(users);
+}
+
+void exitProgram(bool isFailure) {
+  freeUsers();
+  exit(isFailure ? EXIT_FAILURE : EXIT_SUCCESS);
+}
+
+int getUserIdByName(char *userName) {
   int userId = -1;
 
   for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
+    if (!users[i].name) {
+      break;
+    }
     if (strcmp(users[i].name, userName) == 0) {
       userId = i;
       break;
@@ -40,20 +57,31 @@ unsigned int getLengthOfPermissions() {
   return sizeof(permissionsList) / sizeof(permissionsList[0]);
 }
 
-int viewPermissions(struct UserData *users) {
+char *getNameFromUser() {
   char userNameInput[MAX_NAME_LENGTH];
   printf("Please enter your name: ");
   scanf(" %[^\n]", userNameInput);
+  char *userName = malloc(strlen(userNameInput) + 1);
+  if (userName == NULL) {
+    perror("Memory allocation for userName failed.\n");
+    exitProgram(true);
+  }
+  strcpy(userName, userNameInput);
+  return userName;
+}
 
-  int userId = getUserIdByName(users, userNameInput);
+void viewPermissions() {
+  char *userName = getNameFromUser();
+  int userId = getUserIdByName(userName);
+  free(userName);
   if (userId == -1) {
     printf("Couldn\'t find you!");
-    return 1;
+    exitProgram(true);
   } else {
     unsigned int userPermissions = users[userId].permissions;
     if (userPermissions == 0) {
       printf("Oppss, seems you have no permissions");
-      return 0;
+      exitProgram(false);
     }
     unsigned int userPermissionsCounter = 0;
     unsigned int lengthOfPermissions = getLengthOfPermissions();
@@ -71,25 +99,14 @@ int viewPermissions(struct UserData *users) {
         userPermissionsCounter++;
       }
     }
-
-    return 0;
   }
 }
 
-void freeUsers(struct UserData *users) {
-  for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
-    if (users[i].name) {
-      free(users[i].name);
-    }
-  }
-  free(users);
-}
-
-int writeUsersToFile(struct UserData *users) {
+void writeUsersToFile() {
   FILE *file = fopen(USERS_FILE_PATH, "w");
   if (file == NULL) {
     perror("Error opening and writing users to file");
-    return 1;
+    exitProgram(true);
   }
   fprintf(file, "ID\t\tName length\t\tPermissions\t\t\t\tName\n");
 
@@ -97,13 +114,10 @@ int writeUsersToFile(struct UserData *users) {
     fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id,
             users[i].nameLength, users[i].permissions, users[i].name);
   }
-
   fclose(file);
-  return 0;
 }
 
-void populateNewUser(struct UserData *users, char *userName,
-                     unsigned int nameLength, unsigned int permissions) {
+void populateNewUser(char *userName, unsigned int permissions) {
   int lastId = -1;
   for (int i = NUMBER_OF_USERS - 1; i >= 0; i--) {
     if (users[i].nameLength > 0) {
@@ -111,19 +125,17 @@ void populateNewUser(struct UserData *users, char *userName,
       break;
     }
   }
-
   lastId++;
-
   users[lastId].name = userName;
-  users[lastId].nameLength = nameLength;
+  users[lastId].nameLength = strlen(userName);
   users[lastId].id = lastId;
   users[lastId].permissions = permissions;
 }
 
-int readUsersFromFile(struct UserData *users) {
+void readUsersFromFile() {
   bool isFileNotExist = access(USERS_FILE_PATH, F_OK) == -1;
   if (isFileNotExist) {
-    return writeUsersToFile(users);
+    return writeUsersToFile();
   }
   FILE *file = fopen(USERS_FILE_PATH, "r");
   while (fgetc(file) != '\n') {
@@ -139,28 +151,20 @@ int readUsersFromFile(struct UserData *users) {
       users[i].name = malloc(nameLength + 1);
       if (users[i].name == NULL) {
         perror("Memory allocation for user name failed.\n");
-        return 1;
+        exitProgram(true);
       }
       fscanf(file, " %[^\n]", users[i].name);
       printf("Name: %s\n", users[i].name);
     }
   }
   fclose(file);
-  return 0;
 }
 
-int addUser(struct UserData *users) {
-  char nameBuffer[MAX_NAME_LENGTH];
+void addUser() {
   printf(
       "(Name must be at least 1 char unless you wont be able to "
-      "continue)\nPlease enter name: ");
-  scanf(" %[^\n]", nameBuffer);
-  char *userName = malloc(strlen(nameBuffer) + 1);
-  if (userName == NULL) {
-    perror("Memory allocation for userName failed.\n");
-    return 1;
-  }
-  strcpy(userName, nameBuffer);
+      "continue)\n");
+  char *userName = getNameFromUser();
   unsigned int permissions = 0;
   unsigned int lengthOfPermissions = getLengthOfPermissions();
   while (1) {
@@ -190,10 +194,7 @@ int addUser(struct UserData *users) {
     }
     permissions |= permissionsList[currentPermission - 1].value;
   }
-  populateNewUser(users, userName, strlen(nameBuffer), permissions);
-  if (writeUsersToFile(users) == 1) {
-    return 1;
-  }
+  populateNewUser(userName, permissions);
+  writeUsersToFile();
   printf("\n%s added successfully!\n", userName);
-  return 0;
 }
