@@ -59,6 +59,9 @@ unsigned int getLengthOfPermissions() {
 
 char *getNameFromUser() {
   char userNameInput[MAX_NAME_LENGTH];
+  printf(
+      "\nName must be at least 1 char unless you wont be able to "
+      "continue\n");
   printf("\nPlease enter your name: ");
   scanf(" %[^\n]", userNameInput);
   char *userName = malloc(strlen(userNameInput) + 1);
@@ -202,17 +205,37 @@ void editUser() {
     if (choice != -1) {
       printf("\nMust enter valid choice\n");
     }
-    printf("%d", choice);
-    printf("Would you like remove or add permission? 0 to exit\n");
-    printf("1. Add\n");
-    printf("2. Remove\n");
+    printf("Would you like to update your name or permissions? 0 to exit\n");
+    printf("1. Name\n");
+    printf("2. Permissions\n");
     printf("Selection: ");
     scanf("%d", &choice);
   }
-  unsigned int permissions = modifyPermission(userId, choice);
-  users[userId].permissions = permissions;
-  writeUsersToFile();
-  printf("%d updated successfully!", userName);
+  if (choice == 1) {
+    char *newName = getNameFromUser();
+    users[userId].name = newName;
+    writeUsersToFile();
+    printf("%s updated successfully!", newName);
+  } else if (choice == 2) {
+    choice = -1;
+    while (choice != 1 && choice != 2) {
+      if (choice == 0) {
+        exitProgram(false);
+      }
+      if (choice != -1) {
+        printf("\nMust enter valid choice\n");
+      }
+      printf("Would you like remove or add permission? 0 to exit\n");
+      printf("1. Add\n");
+      printf("2. Remove\n");
+      printf("Selection: ");
+      scanf("%d", &choice);
+    }
+    unsigned int permissions = modifyPermission(userId, choice);
+    users[userId].permissions = permissions;
+    writeUsersToFile();
+    printf("%s updated successfully!", userName);
+  }
 }
 
 void viewPermissions() {
@@ -290,9 +313,6 @@ void readUsersFromFile() {
 }
 
 void addUser() {
-  printf(
-      "(Name must be at least 1 char unless you wont be able to "
-      "continue)\n");
   char *userName = getNameFromUser();
   unsigned int permissions = modifyPermission(-1, 1);
   populateNewUser(userName, permissions);
