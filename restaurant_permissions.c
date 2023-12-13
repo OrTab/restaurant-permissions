@@ -299,14 +299,12 @@ void readUsersFromFile() {
 
     unsigned int nameLength = users[i].nameLength;
     if (nameLength > 0) {
-      printf("name length is: %u\n", nameLength);
       users[i].name = malloc(nameLength + 1);
       if (users[i].name == NULL) {
         perror("Memory allocation for user name failed.\n");
         exitProgram(true);
       }
       fscanf(file, " %[^\n]", users[i].name);
-      printf("Name: %s\n", users[i].name);
     }
   }
   fclose(file);
