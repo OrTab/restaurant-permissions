@@ -45,7 +45,7 @@ Employed for adding or granting new permissions.
 
 #### XOR (`^`)
 
-Implemented for toggling or removing permissions.
+Implemented for toggling or removing permissions. Additionally, XOR is utilized for encryption and decryption, providing a secure and efficient method to handle sensitive information. The XOR operator is applied through bitwise operations to ensure robust string encryption and decryption.
 
 #### Left Shift (`<<`)
 
