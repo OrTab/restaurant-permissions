@@ -4,6 +4,7 @@
 
 #define NUMBER_OF_USERS 10
 #define USERS_FILE_PATH "users.txt"
+#define ENCRYPTION_KEY "supersecret"
 
 struct UserData {
   unsigned id;

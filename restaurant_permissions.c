@@ -64,13 +64,31 @@ char *getNameFromUser() {
       "continue\n");
   printf("\nPlease enter your name: ");
   scanf(" %[^\n]", userNameInput);
-  char *userName = malloc(strlen(userNameInput) + 1);
+  size_t nameLength = strlen(userNameInput);
+  char *userName = malloc(nameLength + 1);
   if (userName == NULL) {
     perror("Memory allocation for userName failed.\n");
     exitProgram(true);
   }
+  userName[nameLength] = '\0';
   strcpy(userName, userNameInput);
   return userName;
+}
+
+char *getEncryptedOrDecryptedString(char *str) {
+  size_t length = strlen(str);
+  char *returnValueStr = malloc(length + 1);
+  if (returnValueStr == NULL) {
+    perror("Error while allocate memory for encryptedName!");
+    exitProgram(true);
+  }
+  size_t encryptionKeyLength = strlen(ENCRYPTION_KEY);
+  for (size_t i = 0; i < length; i++) {
+    char currentChar = str[i] ^ ENCRYPTION_KEY[i % encryptionKeyLength];
+    returnValueStr[i] = currentChar;
+  }
+  returnValueStr[length] = '\0';
+  return returnValueStr;
 }
 
 void writeUsersToFile() {
@@ -79,11 +97,23 @@ void writeUsersToFile() {
     perror("Error opening and writing users to file");
     exitProgram(true);
   }
-  fprintf(file, "ID\t\tName length\t\tPermissions\t\t\t\tName\n");
+  char *columnsNames[] = {"ID", "Name length", "Permissions", "Name"};
+  size_t columnsNamesLength = 4;
+  for (size_t i = 0; i < columnsNamesLength; i++) {
+    char *encryptedName = getEncryptedOrDecryptedString(columnsNames[i]);
+    fprintf(file, "%s%s", encryptedName,
+            i < columnsNamesLength - 1 ? "\t\t" : "\n");
+    free(encryptedName);
+  }
 
   for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
+    if (!users[i].name) {
+      continue;
+    }
+    char *encryptedName = getEncryptedOrDecryptedString(users[i].name);
     fprintf(file, "%u\t\t\t%u\t\t\t\t%u\t\t\t\t\t%s\n", users[i].id,
-            users[i].nameLength, users[i].permissions, users[i].name);
+            users[i].nameLength, users[i].permissions, encryptedName);
+    free(encryptedName);
   }
   if (fclose(file) != 0) {
     perror("Error closing file");
@@ -212,10 +242,12 @@ void editUser() {
     scanf("%d", &choice);
   }
   if (choice == 1) {
-    char *newName = getNameFromUser();
-    users[userId].name = newName;
+    char *updatedName = getNameFromUser();
+    free(users[userId].name);
+    users[userId].name = updatedName;
+    users[userId].nameLength = strlen(updatedName);
     writeUsersToFile();
-    printf("%s updated successfully!", newName);
+    printf("%s updated successfully!", updatedName);
   } else if (choice == 2) {
     choice = -1;
     while (choice != 1 && choice != 2) {
@@ -290,8 +322,14 @@ void readUsersFromFile() {
     return writeUsersToFile();
   }
   FILE *file = fopen(USERS_FILE_PATH, "r");
+  int firstChar = fgetc(file);
+  if (firstChar == EOF) {
+    fclose(file);
+    return writeUsersToFile();
+  }
   while (fgetc(file) != '\n') {
-    // Continue reading characters until a newline is found to skip file header
+    // Continue reading characters until a newline is found to skip file
+    // header
   }
   for (unsigned int i = 0; i < NUMBER_OF_USERS; i++) {
     fscanf(file, "%u %u %u", &users[i].id, &users[i].nameLength,
@@ -299,12 +337,10 @@ void readUsersFromFile() {
 
     unsigned int nameLength = users[i].nameLength;
     if (nameLength > 0) {
-      users[i].name = malloc(nameLength + 1);
-      if (users[i].name == NULL) {
-        perror("Memory allocation for user name failed.\n");
-        exitProgram(true);
-      }
-      fscanf(file, " %[^\n]", users[i].name);
+      char name[nameLength + 1];
+      fscanf(file, " %[^\n]", name);
+      users[i].name = getEncryptedOrDecryptedString(name);
+      printf("after decrypt %s - \n", users[i].name);
     }
   }
   fclose(file);
