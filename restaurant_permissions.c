@@ -230,6 +230,7 @@ void editUser() {
   int choice = -1;
   while (choice != 1 && choice != 2) {
     if (choice == 0) {
+      free(userName);
       exitProgram(false);
     }
     if (choice != -1) {
@@ -252,6 +253,7 @@ void editUser() {
     choice = -1;
     while (choice != 1 && choice != 2) {
       if (choice == 0) {
+        free(userName);
         exitProgram(false);
       }
       if (choice != -1) {
